@@ -10,6 +10,8 @@ import Products from "./pages/Products";
 import Signin from "./pages/Signin";
 import Signup from "./pages/Signup";
 import Wishlist from "./pages/Wishlist";
+import Orders from "./pages/Orders";
+import Settings from "./pages/Settings";
 import { CartProvider } from "./context/CartContext";
 import { UserProvider } from "./context/UserContext";
 import { WishlistProvider } from "./context/WishlistContext";
@@ -31,6 +33,8 @@ function App() {
               <Route path="/signin" element={<Signin />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/deals" element={<Deals />} />
+              <Route path="/orders" element={<Orders />} />
+              <Route path="/settings" element={<Settings />} />
             </Routes>
           </WishlistProvider>
         </CartProvider>

@@ -1,5 +1,6 @@
 import React from "react";
 import { FiUser, FiPackage, FiSettings, FiLogOut } from "react-icons/fi";
+import { Link } from "react-router-dom";
 
 const Account = () => {
   // Dummy user data
@@ -36,18 +37,20 @@ const Account = () => {
           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-md hover:shadow transition">
             <div className="flex items-center gap-4">
               <FiPackage className="text-indigo-600 text-xl" />
-              <p className="text-gray-800 font-medium">My Orders</p>
+              <Link to="/orders">
+                My Orders
+              </Link>
             </div>
-            <button className="text-indigo-600 hover:underline text-sm">View Orders</button>
           </div>
 
           {/* Settings Section */}
           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-md hover:shadow transition">
             <div className="flex items-center gap-4">
               <FiSettings className="text-indigo-600 text-xl" />
-              <p className="text-gray-800 font-medium">Account Settings</p>
+              <Link to="/settings">
+                Account Settings
+              </Link>
             </div>
-            <button className="text-indigo-600 hover:underline text-sm">Edit</button>
           </div>
 
           {/* Logout Button */}
