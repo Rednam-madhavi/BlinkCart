@@ -1,12 +1,13 @@
 import { Cart } from "../models/cart.models.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
-export const getCart = asyncHandler(async (req, res) => {
+const getCart = asyncHandler(async (req, res) => {
   const cart = await Cart.findOne({ userId: req.params.userId });
   res.json(cart?.items || []);
 });
 
-export const addToCart = asyncHandler(async (req, res) => {
+const addToCart = asyncHandler(async (req, res) => {
+
   const { userId, item } = req.body;
   let cart = await Cart.findOne({ userId });
 
@@ -23,14 +24,25 @@ export const addToCart = asyncHandler(async (req, res) => {
 
   await cart.save();
   res.json(cart.items);
+
 });
 
-export const removeFromCart = asyncHandler(async (req, res) => {
+const removeFromCart = asyncHandler(async (req, res) => {
+
   const { userId, productId } = req.params;
+
   const cart = await Cart.findOne({ userId });
   if (!cart) return res.status(404).json({ message: "Cart not found" });
 
   cart.items = cart.items.filter(item => item.productId !== productId);
+  
   await cart.save();
   res.json(cart.items);
+
 });
+
+export {
+  getCart,
+  addToCart,
+  removeFromCart
+}

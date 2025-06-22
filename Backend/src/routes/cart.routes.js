@@ -1,11 +1,11 @@
-import express from 'express';
-import { getCart, addToCart, removeFromCart } from '../controllers/cart.controller.js';
+import express from 'express'
+import { getCart, addToCart, removeFromCart } from '../controllers/cart.controller.js'
 import { verifyJwt } from '../middlewares/auth.middleware.js';
 
-const router = express.Router();
+const router = express.Router()
 
-router.get('/:userId', getCart);
-router.post('/', addToCart);
-router.delete('/:userId/:productId', removeFromCart);
+router.route('/').post(verifyJwt, addToCart)
+router.route('/:userId').get(verifyJwt, getCart)
+router.route('/:userId/:productId').delete(verifyJwt, removeFromCart)
 
-export default router;
+export default router
