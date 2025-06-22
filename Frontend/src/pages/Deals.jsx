@@ -42,12 +42,13 @@ const deals = [
   },
 ];
 
+
 const Deals = () => {
   const { addToCart } = useCart();
   const { addToWishlist, wishlistItems, removeFromWishlist } = useWishlist();
 
-  const toggleWishlist = (deal) => {
-    const isInWishlist = wishlistItems.some(item => item.id === deal.id);
+  const toggleWishlist = (product) => {
+    const isInWishlist = wishlistItems.some(item => item.productId === product.id);
     if (isInWishlist) {
       removeFromWishlist(product.id);
     } else {

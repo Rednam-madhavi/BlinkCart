@@ -4,16 +4,13 @@ import cookieParser from 'cookie-parser'
 
 const app = express();
 
-const corsOptions = [
-    'http://localhost:5173',
-    'http://localhost:5173/'
-];
+const corsOptions = {
+  origin: 'http://localhost:5173', // Match exactly what your browser shows
+  credentials: true, // Allow cookies/sessions
+  optionsSuccessStatus: 200 // Legacy browser support
+};
 
-app.use(cors({
-    corsOptions,
-    credentials: true,
-}));
-
+app.use(cors(corsOptions));
 
 app.use(express.json({ limit: '16kb' }))
 app.use(express.urlencoded({ extended: true, limit: '16kb' }))

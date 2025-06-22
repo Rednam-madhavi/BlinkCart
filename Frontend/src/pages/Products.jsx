@@ -47,13 +47,14 @@ const Products = () => {
   const { addToWishlist, wishlistItems, removeFromWishlist } = useWishlist();
 
   const toggleWishlist = (product) => {
-    const isInWishlist = wishlistItems.some(item => item.id === product.id);
+    const isInWishlist = wishlistItems.some(item => item.productId === product.id);
     if (isInWishlist) {
       removeFromWishlist(product.id);
     } else {
       addToWishlist(product);
     }
   };
+
 
   return (
     <div className="min-h-screen p-6 bg-gradient-to-b from-indigo-50 to-purple-50">
@@ -63,7 +64,7 @@ const Products = () => {
         <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {productList.map((product) => {
             const isInWishlist = wishlistItems.some(item => item.id === product.id);
-            
+
             return (
               <div
                 key={`${product.id}-${product.name}`}
@@ -75,21 +76,21 @@ const Products = () => {
                   className="absolute top-3 right-3 p-2 bg-white/80 rounded-full backdrop-blur-sm hover:bg-gray-100 transition-colors z-10"
                   aria-label={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
                 >
-                  <FiHeart 
-                    className={`w-5 h-5 ${isInWishlist ? "text-red-500 fill-current" : "text-gray-400"}`} 
+                  <FiHeart
+                    className={`w-5 h-5 ${isInWishlist ? "text-red-500 fill-current" : "text-gray-400"}`}
                   />
                 </button>
 
-                <img 
-                  src={product.image} 
-                  alt={product.name} 
-                  className="w-full h-48 object-cover" 
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className="w-full h-48 object-cover"
                 />
-                
+
                 <div className="p-4">
                   <h2 className="text-lg font-semibold text-gray-800">{product.name}</h2>
                   <p className="text-indigo-600 font-bold mt-1">${product.price.toFixed(2)}</p>
-                  
+
                   <div className="mt-4 flex justify-between items-center">
                     <button
                       onClick={() => addToCart(product)}

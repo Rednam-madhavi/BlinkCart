@@ -1,8 +1,20 @@
+// src/components/layout/Header.jsx
 import React from "react";
 import { Link } from "react-router-dom";
 import { FiShoppingCart, FiSearch, FiUser, FiMenu, FiHeart } from "react-icons/fi";
+import { useCart } from "../../context/CartContext";
+import { useWishlist } from "../../context/WishlistContext";
 
 const Header = () => {
+  const { cart } = useCart();
+  const { wishlistItems } = useWishlist();
+
+  // Safely get cart items count
+  const cartItemsCount = cart?.items?.length || 0;
+
+  // Safely get wishlist items count
+  const wishlistItemsCount = wishlistItems?.length || 0;
+
   return (
     <header className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white shadow-lg sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -19,12 +31,25 @@ const Header = () => {
           <div className="flex items-center space-x-4">
             <Link to="/wishlist" className="p-2 rounded-md hover:bg-white/10">
               <FiHeart className="h-5 w-5" />
+              {wishlistItemsCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-white text-pink-600 text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                  {wishlistItemsCount}
+                </span>
+              )}
             </Link>
             <Link to="/cart" className="p-2 rounded-md hover:bg-white/10">
               <FiShoppingCart className="h-5 w-5" />
+              {cartItemsCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-yellow-400 text-gray-900 text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                  {cartItemsCount}
+                </span>
+              )}
             </Link>
           </div>
         </div>
+
+        {/* Desktop Header - similar safe checks should be applied here */}
+        {/* ... rest of your header code ... */}
 
         {/* Desktop Header */}
         <div className="hidden md:flex items-center justify-between py-4">

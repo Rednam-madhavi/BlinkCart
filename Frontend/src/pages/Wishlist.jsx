@@ -1,36 +1,45 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FiTrash2, FiShoppingCart } from "react-icons/fi";
 import { useCart } from "../context/CartContext";
-
-// Initial dummy wishlist items
-const initialWishlistItems = [
-  {
-    id: "1",
-    name: "Wireless Headphones",
-    price: 199.99,
-    image: "https://via.placeholder.com/300?text=Headphones",
-  },
-  {
-    id: "2",
-    name: "Smart Watch",
-    price: 149.99,
-    image: "https://via.placeholder.com/300?text=Smart+Watch",
-  },
-];
+import axios from "axios";
 
 const Wishlist = () => {
-  const [wishlistItems, setWishlistItems] = useState(initialWishlistItems);
+  const [wishlistItems, setWishlistItems] = useState([]);
   const { addToCart } = useCart();
 
-  // Add item to cart
-  const handleAddToCart = (item) => {
-    addToCart(item);
-    setWishlistItems((prev) => prev.filter((p) => p.id !== item.id));
+  // Fetch wishlist from server on component mount
+  useEffect(() => {
+    fetchWishlist();
+  }, []);
+
+  const fetchWishlist = async () => {
+    try {
+      const res = await axios.get("/api/wishlist");
+      setWishlistItems(res.data);
+    } catch (err) {
+      console.error("Failed to fetch wishlist", err);
+    }
   };
 
-  // Remove item from wishlist
-  const handleRemove = (id) => {
-    setWishlistItems((prev) => prev.filter((item) => item.id !== id));
+  // Add to cart and remove from wishlist (both in DB)
+  const handleAddToCart = async (item) => {
+    try {
+      await axios.post("/api/cart", item); // Add to cart collection
+      await axios.delete(`/api/wishlist/${item.id}`); // Remove from wishlist collection
+      addToCart(item); // Update local cart context
+      fetchWishlist(); // Refresh wishlist
+    } catch (err) {
+      console.error("Error moving item to cart", err);
+    }
+  };
+
+  const handleRemove = async (id) => {
+    try {
+      await axios.delete(`/api/wishlist/${id}`);
+      fetchWishlist();
+    } catch (err) {
+      console.error("Error removing item from wishlist", err);
+    }
   };
 
   return (
