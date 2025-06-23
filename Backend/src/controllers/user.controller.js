@@ -52,18 +52,18 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 
 const loginUser = asyncHandler(async (req, res) => {
-    const { email, username, password } = req.body;
+    const { email, password } = req.body;
 
-    if (!username && !email) {
-        throw new ApiError(400, 'Username or email is required');
+    if (!email) {
+        throw new ApiError(401, 'Invalid email or password');
     }
 
     const user = await User.findOne({
-        $or: [{ username }, { email }]
+        $or: [{ email }]
     });
 
     if (!user) {
-        throw new ApiError(404, 'User does not exist');
+        throw new ApiError(404, "User does not exist");
     }
 
     const isPasswordValid = await user.isPasswordCorrect(password);
@@ -75,7 +75,7 @@ const loginUser = asyncHandler(async (req, res) => {
     const { accessToken, refreshToken } = await generateTokens(user._id);
 
     const loggedInUser = await User.findById(user._id)
-                                .select('-password -refreshToken');
+        .select('-password -refreshToken');
 
     const options = {
         httpOnly: true,
@@ -118,8 +118,28 @@ const logoutUser = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, {}, 'User logged out'));
 });
 
+const getCurrentUser = asyncHandler(async (req, res) => {
+    const userId = req.user?._id;
+
+    if (!userId) {
+        throw new ApiError(401, "User not authenticated");
+    }
+
+    const user = await User.findById(userId).select("username email");
+
+    if (!user) {
+        throw new ApiError(404, "User not found");
+    }
+
+    res.status(200).json({
+        name: user.username,
+        email: user.email,
+    });
+});
+
 export {
     registerUser,
     loginUser,
-    logoutUser
+    logoutUser,
+    getCurrentUser
 };

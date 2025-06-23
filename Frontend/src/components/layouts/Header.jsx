@@ -1,19 +1,23 @@
-// src/components/layout/Header.jsx
 import React from "react";
-import { Link } from "react-router-dom";
-import { FiShoppingCart, FiSearch, FiUser, FiMenu, FiHeart } from "react-icons/fi";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  FiShoppingCart,
+  FiSearch,
+  FiUser,
+  FiMenu,
+  FiHeart,
+} from "react-icons/fi";
 import { useCart } from "../../context/CartContext";
 import { useWishlist } from "../../context/WishlistContext";
 
 const Header = () => {
   const { cart } = useCart();
   const { wishlistItems } = useWishlist();
+  const navigate = useNavigate();
 
-  // Safely get cart items count
   const cartItemsCount = cart?.items?.length || 0;
-
-  // Safely get wishlist items count
   const wishlistItemsCount = wishlistItems?.length || 0;
+  const token = localStorage.getItem("token");
 
   return (
     <header className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white shadow-lg sticky top-0 z-50">
@@ -29,27 +33,17 @@ const Header = () => {
           </Link>
 
           <div className="flex items-center space-x-4">
-            <Link to="/wishlist" className="p-2 rounded-md hover:bg-white/10">
-              <FiHeart className="h-5 w-5" />
-              {wishlistItemsCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-white text-pink-600 text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                  {wishlistItemsCount}
-                </span>
-              )}
+            <Link to="/login" className="px-3 py-1.5 rounded-md text-sm font-medium hover:bg-white/10 transition">
+              Login
             </Link>
-            <Link to="/cart" className="p-2 rounded-md hover:bg-white/10">
-              <FiShoppingCart className="h-5 w-5" />
-              {cartItemsCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-yellow-400 text-gray-900 text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                  {cartItemsCount}
-                </span>
-              )}
+            <Link
+              to="/signup"
+              className="px-3 py-1.5 rounded-md bg-white text-indigo-600 text-sm font-medium hover:bg-gray-100 transition shadow-sm"
+            >
+              Sign Up
             </Link>
           </div>
         </div>
-
-        {/* Desktop Header - similar safe checks should be applied here */}
-        {/* ... rest of your header code ... */}
 
         {/* Desktop Header */}
         <div className="hidden md:flex items-center justify-between py-4">
@@ -85,36 +79,44 @@ const Header = () => {
               {/* Wishlist */}
               <Link to="/wishlist" className="relative p-2 rounded-full hover:bg-white/10 transition">
                 <FiHeart className="h-5 w-5" />
-                <span className="absolute -top-1 -right-1 bg-white text-pink-600 text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                  0
-                </span>
+                {wishlistItemsCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-white text-pink-600 text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                    {wishlistItemsCount}
+                  </span>
+                )}
               </Link>
 
               {/* Cart */}
               <Link to="/cart" className="relative p-2 rounded-full hover:bg-white/10 transition">
                 <FiShoppingCart className="h-5 w-5" />
-                <span className="absolute -top-1 -right-1 bg-yellow-400 text-gray-900 text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                  0
-                </span>
+                {cartItemsCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-yellow-400 text-gray-900 text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                    {cartItemsCount}
+                  </span>
+                )}
               </Link>
 
-              {/* User Account */}
-              <Link to="/account" className="hidden sm:flex items-center p-2 rounded-full hover:bg-white/10 transition">
-                <FiUser className="h-5 w-5" />
-              </Link>
+              {/* Account */}
+              {token && (
+                <Link to="/account" className="hidden sm:flex items-center p-2 rounded-full hover:bg-white/10 transition">
+                  <FiUser className="h-5 w-5" />
+                </Link>
+              )}
 
               {/* Auth Buttons */}
-              <div className="hidden md:flex items-center space-x-2 ml-2">
-                <Link to="/signin" className="px-3 py-1.5 rounded-md text-sm font-medium hover:bg-white/10 transition">
-                  Sign In
-                </Link>
-                <Link
-                  to="/signup"
-                  className="px-3 py-1.5 rounded-md bg-white text-indigo-600 text-sm font-medium hover:bg-gray-100 transition shadow-sm"
-                >
-                  Sign Up
-                </Link>
-              </div>
+              {!token && (
+                <div className="hidden md:flex items-center space-x-2 ml-2">
+                  <Link to="/login" className="px-3 py-1.5 rounded-md text-sm font-medium hover:bg-white/10 transition">
+                    Login
+                  </Link>
+                  <Link
+                    to="/signup"
+                    className="px-3 py-1.5 rounded-md bg-white text-indigo-600 text-sm font-medium hover:bg-gray-100 transition shadow-sm"
+                  >
+                    Sign Up
+                  </Link>
+                </div>
+              )}
             </div>
           </nav>
         </div>
