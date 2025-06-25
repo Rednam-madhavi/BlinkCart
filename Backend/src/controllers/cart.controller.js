@@ -35,14 +35,32 @@ const removeFromCart = asyncHandler(async (req, res) => {
   if (!cart) return res.status(404).json({ message: "Cart not found" });
 
   cart.items = cart.items.filter(item => item.productId !== productId);
-  
+
   await cart.save();
   res.json(cart.items);
 
 });
 
+const updateCartQuantity = asyncHandler(async (req, res) => {
+  const { userId, productId } = req.params;
+  const { quantity } = req.body;
+
+  const cart = await Cart.findOne({ userId });
+  if (!cart) return res.status(404).json({ message: "Cart not found" });
+
+  const item = cart.items.find(item => item.productId === productId);
+  if (!item) return res.status(404).json({ message: "Product not in cart" });
+
+  item.quantity = quantity;
+  await cart.save();
+
+  res.json(cart.items);
+});
+
 export {
   getCart,
   addToCart,
-  removeFromCart
-}
+  removeFromCart,
+  updateCartQuantity
+};
+

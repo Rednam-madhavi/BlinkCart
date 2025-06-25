@@ -20,7 +20,7 @@ const addToWishlist = asyncHandler(async (req, res) => {
 
   await list.save();
   res.json(list.items);
-  
+
 });
 
 const removeFromWishlist = asyncHandler(async (req, res) => {
@@ -32,7 +32,7 @@ const removeFromWishlist = asyncHandler(async (req, res) => {
   if (!list) return res.status(404).json({ message: "Wishlist not found" });
 
   list.items = list.items.filter(item => item.productId !== productId);
-  
+
   await list.save();
   res.json(list.items);
 });

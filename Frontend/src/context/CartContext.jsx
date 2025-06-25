@@ -38,13 +38,15 @@ export const CartProvider = ({ children }) => {
 
   const addToCart = async (product, quantity = 1) => {
     try {
-      await api.post('/cart', {
+      await await api.post('/cart', {
         userId,
-        productId: product.id,
-        name: product.name,
-        price: product.price,
-        image: product.image,
-        quantity
+        item: {
+          productId: product._id,
+          name: product.name,
+          price: product.price,
+          image: product.image,
+          quantity
+        }
       });
       await fetchCart();
     } catch (err) {
@@ -65,7 +67,7 @@ export const CartProvider = ({ children }) => {
 
   const updateQuantity = async (productId, newQuantity) => {
     if (newQuantity < 1) return;
-    
+
     try {
       await api.patch(`/cart/${userId}/${productId}`, { quantity: newQuantity });
       await fetchCart();
@@ -95,8 +97,8 @@ export const CartProvider = ({ children }) => {
   }, [userId]);
 
   return (
-    <CartContext.Provider 
-      value={{ 
+    <CartContext.Provider
+      value={{
         ...cart,
         loading,
         error,
