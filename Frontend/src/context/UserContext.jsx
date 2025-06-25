@@ -12,7 +12,7 @@ export const UserProvider = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await api.get('/api/v1/users/me');
+        const res = await api.get('/users/me');
         setUser(res.data.user);
       } catch {
         setUser(null);
@@ -25,9 +25,9 @@ export const UserProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      await api.post('/api/v1/users/login', { email, password });
+      await api.post('/users/login', { email, password });
 
-      const res = await api.get('/api/v1/users/me');
+      const res = await api.get('/users/me');
       setUser(res.data.user);
 
       navigate('/');
@@ -42,7 +42,7 @@ export const UserProvider = ({ children }) => {
 
   const register = async (username, email, password) => {
     try {
-      await api.post('/api/v1/users/signup', { username, email, password });
+      await api.post('/users/signup', { username, email, password });
       navigate('/login');
       return { success: true };
     } catch (err) {
@@ -55,7 +55,7 @@ export const UserProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await api.post('/api/v1/users/logout');
+      await api.post('/users/logout');
       setUser(null);
       navigate('/login');
     } catch (err) {
