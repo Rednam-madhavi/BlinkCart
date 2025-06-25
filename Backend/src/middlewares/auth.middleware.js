@@ -1,12 +1,11 @@
-import jwt from 'jsonwebtoken';
-import { ApiError } from '../utils/apiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
+import { ApiError } from '../utils/apiError.js';
 
-export const verifyJwt = asyncHandler(async (req, res, next) => {
+const verifyJwt = asyncHandler(async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    throw new ApiError(401, 'Unauthorized request');
+    throw new ApiError(401, 'Unauthorized request: No token provided');
   }
 
   const token = authHeader.split(' ')[1];
@@ -19,3 +18,5 @@ export const verifyJwt = asyncHandler(async (req, res, next) => {
     throw new ApiError(401, 'Invalid or expired token');
   }
 });
+
+export { verifyJwt };

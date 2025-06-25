@@ -1,4 +1,3 @@
-// src/context/UserContext.js
 import { createContext, useContext, useState, useEffect } from 'react';
 import api from '../api/axios';
 import { useNavigate } from 'react-router-dom';
@@ -10,14 +9,12 @@ export const UserProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Check for existing session on initial load
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await api.get('/users/me');
-        setUser(response.data.user);
-      } catch (err) {
-        // Not logged in or session expired
+        const res = await api.get('/api/v1/users/me');
+        setUser(res.data.user);
+      } catch {
         setUser(null);
       } finally {
         setLoading(false);
@@ -28,74 +25,54 @@ export const UserProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await api.post('/users/login', { email, password });
-      setUser(response.data.user);
-      navigate('/account'); // Redirect after successful login
+      await api.post('/api/v1/users/login', { email, password });
+
+      const res = await api.get('/api/v1/users/me');
+      setUser(res.data.user);
+
+      navigate('/');
       return { success: true };
-    } catch (error) {
-      return { 
-        success: false, 
-        message: error.response?.data?.message || 'Login failed' 
+    } catch (err) {
+      return {
+        success: false,
+        message: err.response?.data?.message || 'Login failed',
       };
     }
   };
 
   const register = async (username, email, password) => {
     try {
-      const response = await api.post('/users/register', { username, email, password });
-      setUser(response.data.user);
-      navigate('/account'); // Redirect after successful registration
+      await api.post('/api/v1/users/signup', { username, email, password });
+      navigate('/login');
       return { success: true };
-    } catch (error) {
+    } catch (err) {
       return {
         success: false,
-        message: error.response?.data?.message || 'Registration failed'
+        message: err.response?.data?.message || 'Registration failed',
       };
     }
   };
 
   const logout = async () => {
     try {
-      await api.post('/users/logout');
+      await api.post('/api/v1/users/logout');
       setUser(null);
       navigate('/login');
-    } catch (error) {
-      console.error('Logout failed:', error);
-    }
-  };
-
-  const updateProfile = async (updatedData) => {
-    try {
-      const response = await api.patch('/users/me', updatedData);
-      setUser(response.data.user);
-      return { success: true };
-    } catch (error) {
-      return {
-        success: false,
-        message: error.response?.data?.message || 'Update failed'
-      };
+    } catch (err) {
+      console.error('Logout failed:', err);
     }
   };
 
   return (
-    <UserContext.Provider 
-      value={{ 
-        user, 
-        loading,
-        login,
-        register,
-        logout,
-        updateProfile
-      }}
-    >
-      {children}
+    <UserContext.Provider value={{ user, setUser, loading, login, register, logout }}>
+      {!loading && children}
     </UserContext.Provider>
   );
 };
 
 export const useUser = () => {
   const context = useContext(UserContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useUser must be used within a UserProvider');
   }
   return context;

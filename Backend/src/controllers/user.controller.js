@@ -1,7 +1,7 @@
 import { User } from '../models/user.models.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
-import { ApiError } from '../utils/ApiError.js';
-import { ApiResponse } from '../utils/ApiResponse.js';
+import { ApiResponse } from '../utils/apiResponse.js';
+import { ApiError } from '../utils/apiError.js';
 
 const generateTokens = async (userId) => {
     try {
@@ -119,22 +119,15 @@ const logoutUser = asyncHandler(async (req, res) => {
 });
 
 const getCurrentUser = asyncHandler(async (req, res) => {
-    const userId = req.user?._id;
+    console.log("req.user", req.user);
 
-    if (!userId) {
-        throw new ApiError(401, "User not authenticated");
-    }
-
-    const user = await User.findById(userId).select("username email");
+    const user = await User.findById(req.user?._id).select('username email role createdAt');
 
     if (!user) {
         throw new ApiError(404, "User not found");
     }
 
-    res.status(200).json({
-        name: user.username,
-        email: user.email,
-    });
+    res.status(200).json({ user });
 });
 
 export {
