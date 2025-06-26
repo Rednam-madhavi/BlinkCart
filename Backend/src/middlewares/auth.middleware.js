@@ -3,13 +3,11 @@ import { ApiError } from '../utils/apiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 
 const verifyJwt = asyncHandler(async (req, res, next) => {
-  const authHeader = req.headers.authorization;
+  const token = req.cookies?.accessToken; // ✅ FROM COOKIE
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    throw new ApiError(401, 'Unauthorized request: No token found');
+  if (!token) {
+    throw new ApiError(401, 'Unauthorized: No token found in cookies');
   }
-
-  const token = authHeader.split(' ')[1];
 
   try {
     const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
@@ -21,7 +19,7 @@ const verifyJwt = asyncHandler(async (req, res, next) => {
       res.clearCookie('refreshToken');
       return res.status(401).json({
         success: false,
-        message: 'Token expired, please log in again',
+        message: 'Token expired. Please log in again.',
       });
     }
 

@@ -11,13 +11,6 @@ export const UserProvider = ({ children }) => {
 
   useEffect(() => {
     const checkAuth = async () => {
-
-      const token = localStorage.getItem("token");
-
-      if (token) {
-        api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      }
-
       try {
         const res = await api.get('/users/me');
         setUser(res.data.user);
@@ -29,6 +22,7 @@ export const UserProvider = ({ children }) => {
     };
     checkAuth();
   }, []);
+
 
   const login = async (email, password) => {
     try {
@@ -46,6 +40,8 @@ export const UserProvider = ({ children }) => {
       };
     }
   };
+
+
 
   const register = async (username, email, password) => {
     try {
