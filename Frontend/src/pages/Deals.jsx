@@ -44,13 +44,13 @@ const deals = [
 ];
 
 const Deals = () => {
-  const { addToCart } = useCart();
+  const { addToCart, items: cartItems } = useCart();
   const { addToWishlist, removeFromWishlist, wishlistItems } = useWishlist();
   const [addedToCart, setAddedToCart] = useState([]);
   const navigate = useNavigate();
 
   const toggleWishlist = (product) => {
-    const isInWishlist = wishlistItems.some(item => item.productId === product._id);
+    const isInWishlist = wishlistItems.some((item) => item.productId === product._id);
     if (isInWishlist) {
       removeFromWishlist(product._id);
     } else {
@@ -59,12 +59,15 @@ const Deals = () => {
   };
 
   const handleCartClick = async (product) => {
-    const isInCart = addedToCart.includes(product._id);
+    const isInCart =
+      cartItems.some((item) => item.productId === product._id) ||
+      addedToCart.includes(product._id);
+
     if (isInCart) {
       navigate("/cart");
     } else {
       await addToCart(product);
-      setAddedToCart(prev => [...prev, product._id]);
+      setAddedToCart((prev) => [...prev, product._id]);
     }
   };
 
@@ -75,38 +78,48 @@ const Deals = () => {
       <div className="max-w-7xl mx-auto">
         <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {deals.map((product) => {
-            const isInWishlist = wishlistItems.some(item => item.productId === product._id);
-            const isInCart = addedToCart.includes(product._id); // ✅ Fix here
+            const isInWishlist = wishlistItems.some((item) => item.productId === product._id);
+            const isInCart =
+              cartItems.some((item) => item.productId === product._id) ||
+              addedToCart.includes(product._id);
 
             return (
               <div
                 key={product._id}
                 className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow border border-gray-100 relative"
               >
+                {/* Wishlist Button */}
                 <button
                   onClick={() => toggleWishlist(product)}
                   className="absolute top-3 right-3 p-2 bg-white/80 rounded-full backdrop-blur-sm hover:bg-gray-100 transition-colors z-10"
                   aria-label={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
                 >
                   <FiHeart
-                    className={`w-5 h-5 ${isInWishlist ? "text-red-500 fill-current" : "text-gray-400"}`}
+                    className={`w-5 h-5 ${isInWishlist ? "text-red-500 fill-current" : "text-gray-400"
+                      }`}
                   />
                 </button>
 
+                {/* Product Image */}
                 <img
                   src={product.image}
                   alt={product.name}
                   className="w-full h-48 object-cover"
                 />
 
+                {/* Product Info */}
                 <div className="p-4">
                   <h2 className="text-lg font-semibold text-gray-800">{product.name}</h2>
-                  <p className="text-indigo-600 font-bold mt-1">${product.price.toFixed(2)}</p>
+                  <p className="text-indigo-600 font-bold mt-1">
+                    ₹{product.price.toLocaleString("en-IN")}
+                  </p>
 
-                  <div className="mt-4 flex justify-between items-center">
+                  {/* Cart Button */}
+                  <div className="mt-4">
                     <button
                       onClick={() => handleCartClick(product)}
-                      className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md transition duration-200"
+                      className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md transition duration-200"
+                      aria-label={isInCart ? "Go to cart" : "Add to cart"}
                     >
                       {isInCart ? "Go to Cart" : "Add to Cart"}
                     </button>

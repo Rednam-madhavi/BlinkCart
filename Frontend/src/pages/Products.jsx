@@ -47,11 +47,13 @@ const Products = () => {
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, wishlistItems } = useWishlist();
   const [addedToCart, setAddedToCart] = useState([]);
+  const [loadingIds, setLoadingIds] = useState([]);
   const navigate = useNavigate();
 
+  const wishlistIds = wishlistItems.map(item => item.productId);
+
   const toggleWishlist = (product) => {
-    const isInWishlist = wishlistItems.some(item => item.productId === product._id);
-    if (isInWishlist) {
+    if (wishlistIds.includes(product._id)) {
       removeFromWishlist(product._id);
     } else {
       addToWishlist(product);
@@ -62,22 +64,25 @@ const Products = () => {
     if (addedToCart.includes(product._id)) {
       navigate("/cart");
     } else {
+      setLoadingIds(prev => [...prev, product._id]);
       await addToCart(product);
       setAddedToCart(prev => [...prev, product._id]);
+      setLoadingIds(prev => prev.filter(id => id !== product._id));
     }
   };
 
   return (
     <div className="min-h-screen p-6 bg-gradient-to-b from-indigo-50 to-purple-50">
-      <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">
+      <h1 className="text-3xl font-bold text-center mb-10 text-gray-800">
         Our Featured Products
       </h1>
 
       <div className="max-w-7xl mx-auto">
         <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {productList.map((product) => {
-            const isInWishlist = wishlistItems.some(item => item.productId === product._id);
+            const isInWishlist = wishlistIds.includes(product._id);
             const isInCart = addedToCart.includes(product._id);
+            const isLoading = loadingIds.includes(product._id);
 
             return (
               <div
@@ -90,14 +95,18 @@ const Products = () => {
                   aria-label={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
                 >
                   <FiHeart
-                    className={`w-5 h-5 ${isInWishlist ? "text-red-500 fill-current" : "text-gray-400"}`}
+                    className={`w-5 h-5 transition ${isInWishlist ? "text-red-500 fill-current" : "text-gray-400"
+                      }`}
                   />
                 </button>
 
                 <img
                   src={product.image}
                   alt={product.name}
-                  className="w-full h-48 object-cover"
+                  className="w-full h-52 object-contain p-4"
+                  onError={(e) => {
+                    e.target.src = "https://via.placeholder.com/500?text=No+Image";
+                  }}
                 />
 
                 <div className="p-4">
@@ -107,9 +116,14 @@ const Products = () => {
                   <div className="mt-4 flex justify-between items-center">
                     <button
                       onClick={() => handleCartClick(product)}
-                      className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md transition duration-200"
+                      disabled={isLoading}
+                      className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md transition duration-200 disabled:opacity-50"
                     >
-                      {isInCart ? "Go to Cart" : "Add to Cart"}
+                      {isLoading
+                        ? "Adding..."
+                        : isInCart
+                          ? "Go to Cart"
+                          : "Add to Cart"}
                     </button>
                   </div>
                 </div>

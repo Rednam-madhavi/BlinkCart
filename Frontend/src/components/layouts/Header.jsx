@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   FiShoppingCart,
@@ -23,10 +23,16 @@ const Header = () => {
   const cartItemsCount = cartItems?.length || 0;
   const wishlistItemsCount = wishlistItems?.length || 0;
 
+  // Prevent background scroll when menu/search is open
+  useEffect(() => {
+    document.body.style.overflow = isMenuOpen || isSearchOpen ? "hidden" : "auto";
+  }, [isMenuOpen, isSearchOpen]);
+
   return (
     <header className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between py-3 md:py-4 relative">
+          {/* Logo and Menu Toggle */}
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -40,6 +46,7 @@ const Header = () => {
             </Link>
           </div>
 
+          {/* Desktop Search Bar */}
           <div className="hidden md:flex w-full max-w-xl mx-auto">
             <div className="relative w-full">
               <input
@@ -51,16 +58,15 @@ const Header = () => {
             </div>
           </div>
 
+          {/* Icons */}
           <div className="flex items-center space-x-3 sm:space-x-4">
+            {/* Desktop Nav Links */}
             <div className="hidden md:flex items-center space-x-6 ml-4">
-              <Link to="/products" className="hover:text-yellow-200 font-medium">
-                Products
-              </Link>
-              <Link to="/deals" className="hover:text-yellow-200 font-medium">
-                Hot Deals
-              </Link>
+              <Link to="/products" className="hover:text-yellow-200 font-medium">Products</Link>
+              <Link to="/deals" className="hover:text-yellow-200 font-medium">Hot Deals</Link>
             </div>
 
+            {/* Mobile Search Icon */}
             <button
               onClick={() => setIsSearchOpen(true)}
               className="md:hidden p-2 hover:bg-white/10 rounded-md"
@@ -68,6 +74,7 @@ const Header = () => {
               <FiSearch className="h-5 w-5" />
             </button>
 
+            {/* Wishlist Icon */}
             <Link to="/wishlist" className="relative p-2 hover:bg-white/10 rounded-full">
               <FiHeart className="h-5 w-5" />
               {wishlistItemsCount > 0 && (
@@ -77,6 +84,7 @@ const Header = () => {
               )}
             </Link>
 
+            {/* Cart Icon */}
             <Link to="/cart" className="relative p-2 hover:bg-white/10 rounded-full">
               <FiShoppingCart className="h-5 w-5" />
               {cartItemsCount > 0 && (
@@ -86,6 +94,7 @@ const Header = () => {
               )}
             </Link>
 
+            {/* User */}
             {!loading && (
               user ? (
                 <Link to="/account" className="hidden sm:flex p-2 hover:bg-white/10 rounded-full">
@@ -106,6 +115,7 @@ const Header = () => {
           </div>
         </div>
 
+        {/* Mobile Menu Links */}
         {isMenuOpen && (
           <div className="md:hidden space-y-3 pb-4 border-t border-white/10 pt-3">
             <Link to="/products" onClick={() => setIsMenuOpen(false)} className="block hover:text-yellow-200">
@@ -132,8 +142,9 @@ const Header = () => {
         )}
       </div>
 
+      {/* Mobile Search Bar */}
       {isSearchOpen && (
-        <div className="absolute left-0 right-0 top-0 z-40 px-4 py-3 md:hidden bg-white shadow-md border-b border-gray-200">
+        <div className="fixed top-0 left-0 right-0 z-50 px-4 py-3 bg-white shadow-md border-b border-gray-200 md:hidden">
           <div className="relative">
             <input
               type="text"
