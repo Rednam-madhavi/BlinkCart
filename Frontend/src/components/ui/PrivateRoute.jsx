@@ -4,8 +4,7 @@ import { useUser } from '../../context/UserContext';
 const PrivateRoute = ({ children }) => {
     const { user, loading } = useUser();
 
-    if (loading) return null; // Wait for auth check
-
+    if (loading) return null;
     return user ? children : <Navigate to="/login" replace />;
 };
 

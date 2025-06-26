@@ -11,25 +11,22 @@ export const UserProvider = ({ children }) => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const token = localStorage.getItem('token');
-      console.log("Stored token:", token);
+
+      const token = localStorage.getItem("token");
 
       if (token) {
-        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       }
 
       try {
         const res = await api.get('/users/me');
-        console.log("User authenticated:", res.data.user);
         setUser(res.data.user);
-      } catch (err) {
-        console.warn("User fetch failed:", err?.response?.data?.message || err.message);
+      } catch {
         setUser(null);
       } finally {
         setLoading(false);
       }
     };
-
     checkAuth();
   }, []);
 
@@ -87,4 +84,3 @@ export const useUser = () => {
   }
   return context;
 };
-
