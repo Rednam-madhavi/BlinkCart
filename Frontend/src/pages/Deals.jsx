@@ -1,56 +1,55 @@
-import React, { useState } from "react";
+import React from "react";
 import { useCart } from "../context/CartContext";
 import { useWishlist } from "../context/WishlistContext";
 import { FiHeart } from "react-icons/fi";
 
 const deals = [
   {
-    id: "1",
+    _id: "1",
     name: "Wireless Headphones",
     price: 199.99,
     image: "https://via.placeholder.com/500?text=Headphones",
   },
   {
-    id: "2",
+    _id: "2",
     name: "Smart Watch",
     price: 149.99,
     image: "https://via.placeholder.com/500?text=Smart+Watch",
   },
   {
-    id: "3",
+    _id: "3",
     name: "Bluetooth Speaker",
     price: 89.99,
     image: "https://via.placeholder.com/500?text=Speaker",
   },
   {
-    id: "4",
+    _id: "4",
     name: "Wireless Earbuds",
     price: 129.99,
     image: "https://via.placeholder.com/500?text=Earbuds",
   },
   {
-    id: "5",
+    _id: "5",
     name: "Fitness Tracker",
     price: 79.99,
     image: "https://via.placeholder.com/500?text=Fitness+Tracker",
   },
   {
-    id: "6",
+    _id: "6",
     name: "Tablet",
     price: 249.99,
     image: "https://via.placeholder.com/500?text=Tablet",
   },
 ];
 
-
 const Deals = () => {
   const { addToCart } = useCart();
-  const { addToWishlist, wishlistItems, removeFromWishlist } = useWishlist();
+  const { addToWishlist, removeFromWishlist, wishlistItems } = useWishlist();
 
   const toggleWishlist = (product) => {
-    const isInWishlist = wishlistItems.some(item => item.productId === product.id);
+    const isInWishlist = wishlistItems.some(item => item.productId === product._id);
     if (isInWishlist) {
-      removeFromWishlist(product.id);
+      removeFromWishlist(product._id);
     } else {
       addToWishlist(product);
     }
@@ -63,11 +62,11 @@ const Deals = () => {
       <div className="max-w-7xl mx-auto">
         <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {deals.map((product) => {
-            const isInWishlist = wishlistItems.some(item => item.id === product.id);
+            const isInWishlist = wishlistItems.some(item => item.productId === product._id);
 
             return (
               <div
-                key={`${product.id}-${product.name}`}
+                key={product._id}
                 className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow border border-gray-100 relative"
               >
                 {/* Wishlist Button */}

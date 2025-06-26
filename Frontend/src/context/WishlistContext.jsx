@@ -6,7 +6,7 @@ const WishlistContext = createContext();
 
 export const WishlistProvider = ({ children }) => {
   const { user } = useUser();
-  const userId = user?._id || "guest";
+  const userId = user?._id;
   const [wishlistItems, setWishlistItems] = useState([]);
 
   const fetchWishlist = async () => {
@@ -14,10 +14,11 @@ export const WishlistProvider = ({ children }) => {
       const res = await api.get(`/wishlist/${userId}`);
       setWishlistItems(res.data || []);
     } catch (err) {
-      console.error("Failed to fetch wishlist", err);
+      console.error("Failed to fetch wishlist", err.response?.data || err.message);
       setWishlistItems([]);
     }
   };
+
 
   const addToWishlist = async (product) => {
     try {
@@ -46,7 +47,7 @@ export const WishlistProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    fetchWishlist();
+    if (userId) fetchWishlist();
   }, [userId]);
 
   return (
@@ -57,4 +58,3 @@ export const WishlistProvider = ({ children }) => {
 };
 
 export const useWishlist = () => useContext(WishlistContext);
-
