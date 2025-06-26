@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { useCart } from "../context/CartContext";
 import { useWishlist } from "../context/WishlistContext";
 import { FiHeart } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 
 const deals = [
   {
@@ -45,6 +46,8 @@ const deals = [
 const Deals = () => {
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, wishlistItems } = useWishlist();
+  const [addedToCart, setAddedToCart] = useState([]);
+  const navigate = useNavigate();
 
   const toggleWishlist = (product) => {
     const isInWishlist = wishlistItems.some(item => item.productId === product._id);
@@ -52,6 +55,16 @@ const Deals = () => {
       removeFromWishlist(product._id);
     } else {
       addToWishlist(product);
+    }
+  };
+
+  const handleCartClick = async (product) => {
+    const isInCart = addedToCart.includes(product._id);
+    if (isInCart) {
+      navigate("/cart");
+    } else {
+      await addToCart(product);
+      setAddedToCart(prev => [...prev, product._id]);
     }
   };
 
@@ -63,13 +76,13 @@ const Deals = () => {
         <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {deals.map((product) => {
             const isInWishlist = wishlistItems.some(item => item.productId === product._id);
+            const isInCart = addedToCart.includes(product._id); // ✅ Fix here
 
             return (
               <div
                 key={product._id}
                 className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow border border-gray-100 relative"
               >
-                {/* Wishlist Button */}
                 <button
                   onClick={() => toggleWishlist(product)}
                   className="absolute top-3 right-3 p-2 bg-white/80 rounded-full backdrop-blur-sm hover:bg-gray-100 transition-colors z-10"
@@ -92,10 +105,10 @@ const Deals = () => {
 
                   <div className="mt-4 flex justify-between items-center">
                     <button
-                      onClick={() => addToCart(product)}
+                      onClick={() => handleCartClick(product)}
                       className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md transition duration-200"
                     >
-                      Add to Cart
+                      {isInCart ? "Go to Cart" : "Add to Cart"}
                     </button>
                   </div>
                 </div>

@@ -13,22 +13,20 @@ import { useWishlist } from "../../context/WishlistContext";
 import { useUser } from "../../context/UserContext";
 
 const Header = () => {
-  const { cart } = useCart();
+  const { items: cartItems } = useCart();
   const { wishlistItems } = useWishlist();
   const { user, loading } = useUser();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
-  const cartItemsCount = cart?.items?.length || 0;
+  const cartItemsCount = cartItems?.length || 0;
   const wishlistItemsCount = wishlistItems?.length || 0;
 
   return (
     <header className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header Section */}
         <div className="flex items-center justify-between py-3 md:py-4 relative">
-          {/* Left: Logo + Mobile Menu */}
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -42,7 +40,6 @@ const Header = () => {
             </Link>
           </div>
 
-          {/* Desktop Search */}
           <div className="hidden md:flex w-full max-w-xl mx-auto">
             <div className="relative w-full">
               <input
@@ -54,9 +51,7 @@ const Header = () => {
             </div>
           </div>
 
-          {/* Desktop Nav Links + Icons */}
           <div className="flex items-center space-x-3 sm:space-x-4">
-            {/* Desktop Links */}
             <div className="hidden md:flex items-center space-x-6 ml-4">
               <Link to="/products" className="hover:text-yellow-200 font-medium">
                 Products
@@ -66,7 +61,6 @@ const Header = () => {
               </Link>
             </div>
 
-            {/* Mobile Search Icon */}
             <button
               onClick={() => setIsSearchOpen(true)}
               className="md:hidden p-2 hover:bg-white/10 rounded-md"
@@ -74,7 +68,6 @@ const Header = () => {
               <FiSearch className="h-5 w-5" />
             </button>
 
-            {/* Wishlist */}
             <Link to="/wishlist" className="relative p-2 hover:bg-white/10 rounded-full">
               <FiHeart className="h-5 w-5" />
               {wishlistItemsCount > 0 && (
@@ -84,7 +77,6 @@ const Header = () => {
               )}
             </Link>
 
-            {/* Cart */}
             <Link to="/cart" className="relative p-2 hover:bg-white/10 rounded-full">
               <FiShoppingCart className="h-5 w-5" />
               {cartItemsCount > 0 && (
@@ -94,7 +86,6 @@ const Header = () => {
               )}
             </Link>
 
-            {/* User / Auth */}
             {!loading && (
               user ? (
                 <Link to="/account" className="hidden sm:flex p-2 hover:bg-white/10 rounded-full">
@@ -112,12 +103,9 @@ const Header = () => {
                 </div>
               )
             )}
-
-
           </div>
         </div>
 
-        {/* Mobile Menu Drawer */}
         {isMenuOpen && (
           <div className="md:hidden space-y-3 pb-4 border-t border-white/10 pt-3">
             <Link to="/products" onClick={() => setIsMenuOpen(false)} className="block hover:text-yellow-200">
@@ -144,7 +132,6 @@ const Header = () => {
         )}
       </div>
 
-      {/* Mobile Search Overlay */}
       {isSearchOpen && (
         <div className="absolute left-0 right-0 top-0 z-40 px-4 py-3 md:hidden bg-white shadow-md border-b border-gray-200">
           <div className="relative">

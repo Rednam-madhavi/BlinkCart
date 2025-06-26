@@ -1,44 +1,48 @@
-// src/context/CartContext.jsx
 import { createContext, useContext, useState, useEffect } from 'react';
 import api from '../api/axios';
-import { useUser } from './UserContext'; // Import UserContext to get current user
+import { useUser } from './UserContext';
 
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  const { user } = useUser(); // Get current user from UserContext
-  const [cart, setCart] = useState({ items: [], total: 0, isOpen: false });
+  const { user } = useUser();
+  const userId = user?._id || 'guest';
+
+  const [cart, setCart] = useState({
+    items: [],
+    total: 0,
+    isOpen: false
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Get userId - use logged in user's ID or 'guest' if not authenticated
-  const userId = user?._id || 'guest';
+  const calculateTotal = (items) => {
+    return items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+  };
 
   const fetchCart = async () => {
     setLoading(true);
     try {
       const res = await api.get(`/cart/${userId}`);
-      setCart({
-        items: res.data.items || [],
-        total: calculateTotal(res.data.items || []),
-        isOpen: cart.isOpen // Maintain current modal state
-      });
+      const items = res.data?.items || res.data || [];
+
+      setCart(prev => ({
+        ...prev,
+        items,
+        total: calculateTotal(items)
+      }));
       setError(null);
     } catch (err) {
-      setError(err.message);
-      console.error("Failed to fetch cart:", err);
+      setError("Failed to fetch cart");
+      console.error("Fetch cart error:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  const calculateTotal = (items) => {
-    return items.reduce((total, item) => total + (item.price * item.quantity), 0);
-  };
-
   const addToCart = async (product, quantity = 1) => {
     try {
-      await await api.post('/cart', {
+      await api.post('/cart', {
         userId,
         item: {
           productId: product._id,
@@ -50,8 +54,8 @@ export const CartProvider = ({ children }) => {
       });
       await fetchCart();
     } catch (err) {
-      setError(err.message);
-      console.error("Add to cart failed:", err);
+      setError("Add to cart failed");
+      console.error("Add to cart error:", err);
     }
   };
 
@@ -60,20 +64,19 @@ export const CartProvider = ({ children }) => {
       await api.delete(`/cart/${userId}/${productId}`);
       await fetchCart();
     } catch (err) {
-      setError(err.message);
-      console.error("Remove from cart failed:", err);
+      setError("Remove from cart failed");
+      console.error("Remove from cart error:", err);
     }
   };
 
-  const updateQuantity = async (productId, newQuantity) => {
-    if (newQuantity < 1) return;
-
+  const updateQuantity = async (productId, quantity) => {
+    if (quantity < 1) return;
     try {
-      await api.patch(`/cart/${userId}/${productId}`, { quantity: newQuantity });
+      await api.patch(`/cart/${userId}/${productId}`, { quantity });
       await fetchCart();
     } catch (err) {
-      setError(err.message);
-      console.error("Update quantity failed:", err);
+      setError("Update quantity failed");
+      console.error("Update quantity error:", err);
     }
   };
 
@@ -83,15 +86,15 @@ export const CartProvider = ({ children }) => {
 
   const clearCart = async () => {
     try {
+      // NOTE: implement this route in your backend if not yet
       await api.delete(`/cart/${userId}/clear`);
       setCart({ items: [], total: 0, isOpen: false });
     } catch (err) {
-      setError(err.message);
-      console.error("Clear cart failed:", err);
+      setError("Clear cart failed");
+      console.error("Clear cart error:", err);
     }
   };
 
-  // Fetch cart on initial render and when user changes
   useEffect(() => {
     fetchCart();
   }, [userId]);

@@ -1,11 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import { useCart } from "../context/CartContext";
 import { useWishlist } from "../context/WishlistContext";
 import { FiHeart } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 
 const productList = [
   {
-    _id: "1", // ✅ Changed from id to _id
+    _id: "1",
     name: "Wireless Headphones",
     price: 199.99,
     image: "https://via.placeholder.com/500?text=Headphones",
@@ -45,6 +46,8 @@ const productList = [
 const Products = () => {
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, wishlistItems } = useWishlist();
+  const [addedToCart, setAddedToCart] = useState([]);
+  const navigate = useNavigate();
 
   const toggleWishlist = (product) => {
     const isInWishlist = wishlistItems.some(item => item.productId === product._id);
@@ -55,6 +58,14 @@ const Products = () => {
     }
   };
 
+  const handleCartClick = async (product) => {
+    if (addedToCart.includes(product._id)) {
+      navigate("/cart");
+    } else {
+      await addToCart(product);
+      setAddedToCart(prev => [...prev, product._id]);
+    }
+  };
 
   return (
     <div className="min-h-screen p-6 bg-gradient-to-b from-indigo-50 to-purple-50">
@@ -66,6 +77,7 @@ const Products = () => {
         <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {productList.map((product) => {
             const isInWishlist = wishlistItems.some(item => item.productId === product._id);
+            const isInCart = addedToCart.includes(product._id);
 
             return (
               <div
@@ -94,10 +106,10 @@ const Products = () => {
 
                   <div className="mt-4 flex justify-between items-center">
                     <button
-                      onClick={() => addToCart(product)}
+                      onClick={() => handleCartClick(product)}
                       className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md transition duration-200"
                     >
-                      Add to Cart
+                      {isInCart ? "Go to Cart" : "Add to Cart"}
                     </button>
                   </div>
                 </div>

@@ -3,12 +3,14 @@ import { useCart } from "../context/CartContext";
 import { Link } from "react-router-dom";
 
 const Cart = () => {
-  const { items, total } = useCart();
+  const {
+    items,
+    total,
+    updateQuantity,
+    removeFromCart
+  } = useCart();
 
-  const subtotal = (items || []).reduce(
-    (total, item) => total + item.price * (item.quantity || 1),
-    0
-  ).toFixed(2);
+  const subtotal = total.toFixed(2);
 
   return (
     <div className="min-h-[89vh] bg-gray-100 py-10 px-4">
@@ -30,9 +32,30 @@ const Cart = () => {
                     />
                     <div>
                       <h3 className="text-lg font-semibold text-gray-800">{item.name}</h3>
-                      <p className="text-sm text-gray-500">
+                      <div className="text-sm text-gray-500 flex gap-4 items-center mt-1">
                         ${item.price.toFixed(2)} × {item.quantity}
-                      </p>
+                        <div className="flex items-center gap-1">
+                          <button
+                            className="px-2 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded"
+                            onClick={() => {
+                              if (item.quantity > 1) {
+                                updateQuantity(item.productId, item.quantity - 1);
+                              }
+                            }}
+                          >−</button>
+                          <span>{item.quantity}</span>
+                          <button
+                            className="px-2 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded"
+                            onClick={() => updateQuantity(item.productId, item.quantity + 1)}
+                          >+</button>
+                          <button
+                            className="ml-2 text-red-600 text-sm"
+                            onClick={() => removeFromCart(item.productId)}
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                   <p className="text-indigo-600 font-bold">
