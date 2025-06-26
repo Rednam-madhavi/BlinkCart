@@ -1,28 +1,40 @@
-import React from "react";
+// src/pages/Home.jsx
+import React, { useEffect, useState } from "react";
 import ProductCard from "../components/ui/ProductCard";
-
-const sampleProducts = [
-  {
-    id: 1,
-    name: "Wireless Headphones",
-    price: 99.99,
-    image: "https://via.placeholder.com/300?text=Headphones",
-  },
-  {
-    id: 2,
-    name: "Smart Watch",
-    price: 129.99,
-    image: "https://via.placeholder.com/300?text=Smart+Watch",
-  },
-  {
-    id: 3,
-    name: "Bluetooth Speaker",
-    price: 79.99,
-    image: "https://via.placeholder.com/300?text=Speaker",
-  },
-];
+import LoadingSpinner from "../components/ui/LoadingSpinner";
 
 const Home = () => {
+  const [featured, setFeatured] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchFeaturedProducts = async () => {
+      try {
+        const res = await fetch("https://fakestoreapi.com/products?limit=6");
+        const data = await res.json();
+
+        const formatted = Array.isArray(data)
+          ? data
+            .filter(p => p?.id && p?.title && p?.image)
+            .map(product => ({
+              id: product.id.toString(),
+              name: product.title,
+              price: product.price,
+              image: product.image,
+            }))
+          : [];
+
+        setFeatured(formatted);
+      } catch (err) {
+        console.error("Error fetching featured products:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeaturedProducts();
+  }, []);
+
   return (
     <main className="min-h-[90vh] bg-gradient-to-br from-indigo-50 to-white py-10 px-4 sm:px-6">
       <div className="max-w-7xl mx-auto">
@@ -38,11 +50,15 @@ const Home = () => {
 
         {/* Featured Products */}
         <section>
-          <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
-            {sampleProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          {loading ? (
+            <LoadingSpinner />
+          ) : (
+            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+              {featured.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          )}
         </section>
 
         {/* CTA */}
@@ -60,3 +76,6 @@ const Home = () => {
 };
 
 export default Home;
+
+
+

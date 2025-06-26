@@ -1,137 +1,128 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useCart } from "../context/CartContext";
 import { useWishlist } from "../context/WishlistContext";
-import { FiHeart } from "react-icons/fi";
-import { useNavigate } from "react-router-dom";
-
-const productList = [
-  {
-    _id: "1",
-    name: "Wireless Headphones",
-    price: 199.99,
-    image: "https://via.placeholder.com/500?text=Headphones",
-  },
-  {
-    _id: "2",
-    name: "Smart Watch",
-    price: 149.99,
-    image: "https://via.placeholder.com/500?text=Smart+Watch",
-  },
-  {
-    _id: "3",
-    name: "Bluetooth Speaker",
-    price: 89.99,
-    image: "https://via.placeholder.com/500?text=Speaker",
-  },
-  {
-    _id: "4",
-    name: "Wireless Earbuds",
-    price: 129.99,
-    image: "https://via.placeholder.com/500?text=Earbuds",
-  },
-  {
-    _id: "5",
-    name: "Fitness Tracker",
-    price: 79.99,
-    image: "https://via.placeholder.com/500?text=Fitness+Tracker",
-  },
-  {
-    _id: "6",
-    name: "Tablet",
-    price: 249.99,
-    image: "https://via.placeholder.com/500?text=Tablet",
-  },
-];
+import ProductCard from "../components/ui/ProductCard";
+import LoadingSpinner from "../components/ui/LoadingSpinner";
 
 const Products = () => {
-  const { addToCart } = useCart();
+  const { addToCart, items: cartItems } = useCart();
   const { addToWishlist, removeFromWishlist, wishlistItems } = useWishlist();
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const [addedToCart, setAddedToCart] = useState([]);
-  const [loadingIds, setLoadingIds] = useState([]);
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
 
-  const wishlistIds = wishlistItems.map(item => item.productId);
+  const wishlistIds = wishlistItems.map((item) => item.productId);
+
+  // Fetch categories
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch("https://fakestoreapi.com/products/categories");
+        const data = await res.json();
+        setCategories(["all", ...data]);
+      } catch (err) {
+        console.error("Failed to fetch categories", err);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  // Fetch products
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true);
+      try {
+        const url =
+          selectedCategory === "all"
+            ? "https://fakestoreapi.com/products"
+            : `https://fakestoreapi.com/products/category/${selectedCategory}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        setProducts(data);
+      } catch (err) {
+        console.error("Failed to fetch products", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, [selectedCategory]);
 
   const toggleWishlist = (product) => {
-    if (wishlistIds.includes(product._id)) {
-      removeFromWishlist(product._id);
-    } else {
-      addToWishlist(product);
-    }
+    const productId = product.id.toString();
+    const isInWishlist = wishlistIds.includes(productId);
+
+    const item = {
+      productId,
+      name: product.title,
+      price: product.price,
+      image: product.image,
+    };
+
+    isInWishlist ? removeFromWishlist(productId) : addToWishlist(item);
   };
 
   const handleCartClick = async (product) => {
-    if (addedToCart.includes(product._id)) {
-      navigate("/cart");
-    } else {
-      setLoadingIds(prev => [...prev, product._id]);
-      await addToCart(product);
-      setAddedToCart(prev => [...prev, product._id]);
-      setLoadingIds(prev => prev.filter(id => id !== product._id));
+    const productId = product.id.toString();
+    const isInCart =
+      cartItems?.some((item) => item.productId === productId) ||
+      addedToCart.includes(productId);
+
+    if (!isInCart) {
+      await addToCart({
+        _id: productId,
+        name: product.title,
+        price: product.price,
+        image: product.image,
+      });
+      setAddedToCart((prev) => [...prev, productId]);
     }
   };
 
   return (
     <div className="min-h-screen p-6 bg-gradient-to-b from-indigo-50 to-purple-50">
-      <h1 className="text-3xl font-bold text-center mb-10 text-gray-800">
-        Our Featured Products
+      <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">
+        Browse Products by Category
       </h1>
 
-      <div className="max-w-7xl mx-auto">
-        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-          {productList.map((product) => {
-            const isInWishlist = wishlistIds.includes(product._id);
-            const isInCart = addedToCart.includes(product._id);
-            const isLoading = loadingIds.includes(product._id);
-
-            return (
-              <div
-                key={product._id}
-                className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow border border-gray-100 relative"
-              >
-                <button
-                  onClick={() => toggleWishlist(product)}
-                  className="absolute top-3 right-3 p-2 bg-white/80 rounded-full backdrop-blur-sm hover:bg-gray-100 transition-colors z-10"
-                  aria-label={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
-                >
-                  <FiHeart
-                    className={`w-5 h-5 transition ${isInWishlist ? "text-red-500 fill-current" : "text-gray-400"
-                      }`}
-                  />
-                </button>
-
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-52 object-contain p-4"
-                  onError={(e) => {
-                    e.target.src = "https://via.placeholder.com/500?text=No+Image";
-                  }}
-                />
-
-                <div className="p-4">
-                  <h2 className="text-lg font-semibold text-gray-800">{product.name}</h2>
-                  <p className="text-indigo-600 font-bold mt-1">${product.price.toFixed(2)}</p>
-
-                  <div className="mt-4 flex justify-between items-center">
-                    <button
-                      onClick={() => handleCartClick(product)}
-                      disabled={isLoading}
-                      className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md transition duration-200 disabled:opacity-50"
-                    >
-                      {isLoading
-                        ? "Adding..."
-                        : isInCart
-                          ? "Go to Cart"
-                          : "Add to Cart"}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+      {/* Category Filter */}
+      <div className="flex flex-wrap justify-center gap-3 mb-10">
+        {categories.map((cat) => (
+          <button
+            key={cat}
+            onClick={() => setSelectedCategory(cat)}
+            className={`px-4 py-2 rounded-full border font-medium capitalize transition ${selectedCategory === cat
+                ? "bg-indigo-600 text-white"
+                : "bg-white text-gray-800 border-gray-300 hover:bg-gray-100"
+              }`}
+          >
+            {cat}
+          </button>
+        ))}
       </div>
+
+      {/* Product List */}
+      {loading ? (
+        <div className="flex justify-center py-10">
+          <LoadingSpinner />
+        </div>
+      ) : (
+        <div className="max-w-7xl mx-auto grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+          {products.map((product) => (
+            <ProductCard
+              key={product.id}
+              product={{
+                _id: product.id.toString(),
+                name: product.title,
+                price: product.price,
+                image: product.image,
+              }}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
