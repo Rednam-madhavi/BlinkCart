@@ -144,7 +144,7 @@ const Header = () => {
 
       {/* Mobile Search Bar */}
       {isSearchOpen && (
-        <div className="fixed top-0 left-0 right-0 z-50 px-4 py-3 bg-white shadow-md border-b border-gray-200 md:hidden">
+        <div className="fixed top-0 left-0 right-0 z-50 px-4 py-3 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 shadow-md border-b border-gray-200 md:hidden">
           <div className="relative">
             <input
               type="text"

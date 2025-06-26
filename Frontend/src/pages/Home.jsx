@@ -10,7 +10,7 @@ const Home = () => {
   useEffect(() => {
     const fetchFeaturedProducts = async () => {
       try {
-        const res = await fetch("https://fakestoreapi.com/products?limit=6");
+        const res = await fetch("https://fakestoreapi.com/products?limit=3");
         const data = await res.json();
 
         const formatted = Array.isArray(data)
